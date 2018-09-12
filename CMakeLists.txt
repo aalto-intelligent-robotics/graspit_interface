@@ -1,21 +1,29 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(graspit_interface)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
+    shape_msgs
     geometry_msgs
     sensor_msgs
     roscpp
     actionlib
-    actionlib_msgs)
+    actionlib_msgs
+    graspit_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(Qt4 COMPONENTS QtCore  REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui  REQUIRED)
+find_package(PCL 1.2 REQUIRED)
+
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 find_package(graspit)
 
 
@@ -69,6 +77,7 @@ find_package(graspit)
  add_service_files(
    DIRECTORY srv
    FILES
+   AddObject.srv
    GetRobot.srv
    GetGraspableBody.srv
    GetBody.srv
@@ -105,6 +114,8 @@ find_package(graspit)
    DIRECTORY action
    FILES
    PlanGrasps.action
+   GetSegmentedMeshedScene.action
+   CompleteMesh.action
  )
 
 ## Generate added messages and services with any dependencies listed here
@@ -115,6 +126,7 @@ find_package(graspit)
    geometry_msgs
    actionlib_msgs
    actionlib
+   shape_msgs
  )
 
 ################################################
@@ -149,7 +161,7 @@ find_package(graspit)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES graspit_interface
-  CATKIN_DEPENDS geometry_msgs std_msgs message_runtime
+  CATKIN_DEPENDS geometry_msgs std_msgs message_runtime shape_msgs
 #  DEPENDS system_lib
 )
 
@@ -200,6 +212,7 @@ add_dependencies(graspit_interface ${PROJECT_NAME}_gencpp)
 target_link_libraries(graspit_interface
   ${catkin_LIBRARIES}
   ${QT_LIBRARIES}
+${PCL_LIBRARIES}
 )
 
 #############
