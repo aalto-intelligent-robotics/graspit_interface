@@ -20,6 +20,7 @@
 #include <graspit/EGPlanner/energy/searchEnergy.h>
 #include <graspit/bodySensor.h>
 #include <graspit/cmdline/cmdline.h>
+#include "graspit/EGPlanner/search.h"
 #define AXIS_SCALE 1000
 using namespace graspit_msgs;
 namespace GraspitInterface
@@ -80,7 +81,7 @@ namespace GraspitInterface
     {
 	ros::init(argc, argv, "graspit_interface_node");
 
-
+	
 	const std::string node_name_help =
 	    "print Ros Node name\n";
 
@@ -97,7 +98,7 @@ namespace GraspitInterface
 
 
 	nh = new ros::NodeHandle(node_name);
-
+	nh->getParam("/Render", render);
 	addObject_srv = nh->advertiseService("addObject", &GraspitInterface::addObjectCB, this);
 
 	getRobot_srv = nh->advertiseService("getRobot", &GraspitInterface::getRobotCB, this);
@@ -801,7 +802,7 @@ namespace GraspitInterface
 	    return true;
 	}
 	else{
-	    graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, 1.0, false);
+	    graspitCore->getWorld()->getHand(request.id)->autoGrasp(render, 1.0, false);
 	    graspitCore->getWorld()->updateGrasps();
 	}
 	return true;
@@ -815,7 +816,7 @@ namespace GraspitInterface
 	    return true;
 	}
 	else{
-	    graspitCore->getWorld()->getHand(request.id)->autoGrasp(true, -1.0, false);
+	    graspitCore->getWorld()->getHand(request.id)->autoGrasp(render, -1.0, false);
 	    graspitCore->getWorld()->updateGrasps();
 	}
 	return true;
@@ -847,7 +848,7 @@ namespace GraspitInterface
 	    response.result = response.RESULT_DYNAMICS_MODE_ENABLED;
 	    return true;
 	} else {
-	    graspitCore->getWorld()->getHand(request.id)->moveDOFToContacts(request.dofs.data(), request.desired_steps.data(), request.stopAtContact);
+	    graspitCore->getWorld()->getHand(request.id)->moveDOFToContacts(request.dofs.data(), request.desired_steps.data(), request.stopAtContact, render);
 	    response.result = response.RESULT_SUCCESS;
 	    return true;
 	}
@@ -900,6 +901,7 @@ namespace GraspitInterface
 
 	transf newTransform(newRotation, newTranslation);
 	r->setTran(newTransform);
+	r->setRenderGeometry(render);
 	return true;
     }
 
@@ -1033,14 +1035,14 @@ namespace GraspitInterface
 	    graspit_interface::ToggleAllCollisions::Response &response)
     {
 	graspitCore->getWorld()->toggleAllCollisions(request.enableCollisions);
-	if(request.enableCollisions)
-	{
-	    ROS_INFO("Collision Detection is On, objects cannot interpentrate");
-	}
-	else
-	{
-	    ROS_INFO("Collision Detection is Off, objects can interpentrate");
-	}
+	//if(request.enableCollisions)
+	//{
+	//    ROS_INFO("Collision Detection is On, objects cannot interpentrate");
+	//}
+	//else
+	//{
+	//    ROS_INFO("Collision Detection is Off, objects can interpentrate");
+	//}
 	return true;
     }
 
@@ -1293,6 +1295,8 @@ namespace GraspitInterface
 
 	mPlanner->setEnergyType(goal.search_energy);
 
+	//if (!render)
+		//mPlanner->setRenderType(RENDER_NEVER);
 	if (goal.sim_ann_params.set_custom_params)
 	{
 	    ROS_INFO("Switching SimAnn Annealing parameters to your custom defined values!!! ");

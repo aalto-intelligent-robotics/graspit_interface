@@ -77,6 +77,7 @@ namespace GraspitInterface
 	Q_OBJECT
 
 	private:
+	    bool render=true;
 	    ros::NodeHandle *nh;
 
 	    // Service declarations

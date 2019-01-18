@@ -1,3 +1,5 @@
 <launch>
+   <arg name="render" default="true"/>
+<param name="Render" value="$(arg render)"/>
   <node name="graspit_interface" pkg="graspit_interface" type="launch_graspit.sh" output="screen"/>
 </launch>
