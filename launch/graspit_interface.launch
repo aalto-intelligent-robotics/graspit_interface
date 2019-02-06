@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
    <arg name="render" default="true"/>
 <param name="Render" value="$(arg render)"/>
