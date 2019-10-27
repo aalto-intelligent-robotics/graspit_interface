@@ -13,7 +13,9 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     actionlib
     actionlib_msgs
-    graspit_msgs)
+    graspit_msgs
+    pc_pipeline_msgs 
+    )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
