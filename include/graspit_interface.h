@@ -6,7 +6,6 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <actionlib/client/simple_action_client.h>
-#endif
 
 //GraspIt! includes
 #include <graspit/plugin.h>
@@ -313,4 +312,5 @@ Q_SIGNALS:
 }
 
 
+#endif
 #endif
