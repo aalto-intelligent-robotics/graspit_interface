@@ -24,7 +24,7 @@
 #include <QLabel>
 //Message includes
 #include <graspit_interface/SearchSpace.h>
-#include "pc_pipeline_msgs/CompleteSceneAction.h"
+#include "scene_completion_msgs/CompleteSceneAction.h"
 // Service includes
 #include <graspit_interface/AddObject.h>
 #include <graspit_interface/Robot.h>
@@ -128,7 +128,7 @@ namespace GraspitInterface
 	    graspit_interface::PlanGraspsResult result_;
 	    graspit_interface::PlanGraspsGoal goal;
 
-	    actionlib::SimpleActionClient<pc_pipeline_msgs::CompleteSceneAction> *get_segmented_meshed_scene_client;
+	    actionlib::SimpleActionClient<scene_completion_msgs::CompleteSceneAction> *get_segmented_meshed_scene_client;
 	    actionlib::SimpleActionClient<graspit_interface::CompleteMeshAction> *complete_mesh_client;
 	    actionlib::SimpleActionClient<graspit_msgs::RunObjectRecognitionAction> *recognizeObjectsActionClient;
 
@@ -286,10 +286,10 @@ namespace GraspitInterface
 	    virtual int init(int argc, char **argv);
 
 	    virtual int mainLoop();
-	    void receivedMeshedSceneCB(const actionlib::SimpleClientGoalState& state, const pc_pipeline_msgs::CompleteSceneResultConstPtr& result);
+	    void receivedMeshedSceneCB(const actionlib::SimpleClientGoalState& state, const scene_completion_msgs::CompleteSceneResultConstPtr& result);
 	    void completeMeshCB(const actionlib::SimpleClientGoalState& state, const
 	    graspit_interface::CompleteMeshResultConstPtr& result);
-	    void getSegmentedMeshesCB(const pc_pipeline_msgs::CompleteSceneResultConstPtr& result);
+	    void getSegmentedMeshesCB(const scene_completion_msgs::CompleteSceneResultConstPtr& result);
 	    void objectRecognitionCB(const actionlib::SimpleClientGoalState& state, const graspit_msgs::RunObjectRecognitionResultConstPtr& result);
 	    public Q_SLOTS:
 

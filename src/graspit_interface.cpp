@@ -126,11 +126,11 @@ namespace GraspitInterface
 	importGraspableBody_srv = nh->advertiseService("importGraspableBody", &GraspitInterface::importGraspableBodyCB, this);
 
 	//Shape completion stuff
-	get_segmented_meshed_scene_client= new actionlib::SimpleActionClient<pc_pipeline_msgs::CompleteSceneAction>("/SceneCompletion",		    true);
+	get_segmented_meshed_scene_client= new actionlib::SimpleActionClient<scene_completion_msgs::CompleteSceneAction>("/SceneCompletion",		    true);
 	complete_mesh_client = new actionlib::SimpleActionClient<graspit_interface::CompleteMeshAction>("/complete_mesh",		    true);
 	recognizeObjectsActionClient = new actionlib::SimpleActionClient<RunObjectRecognitionAction>("/recognize_objects_action",		    true);
 
-	meshed_scene_repub = nh->advertise<pc_pipeline_msgs::CompleteSceneResult>("/get_segmented_meshed_scene",1);
+	meshed_scene_repub = nh->advertise<scene_completion_msgs::CompleteSceneResult>("/get_segmented_meshed_scene",1);
 	meshed_scene_sub = nh->subscribe("/get_segmented_meshed_scene",	10, &GraspitInterface::getSegmentedMeshesCB, this);
 	clearWorld_srv = nh->advertiseService("clearWorld", &GraspitInterface::clearWorldCB, this);
 	loadWorld_srv = nh->advertiseService("loadWorld", &GraspitInterface::loadWorldCB, this);
@@ -253,18 +253,18 @@ namespace GraspitInterface
 
 	std::cout << "ThreadId" <<std::this_thread::get_id() << std::endl;
 
-	pc_pipeline_msgs::CompleteSceneGoal goal;
+	scene_completion_msgs::CompleteSceneGoal goal;
 	goal.object_completion_topic = "depth";
 
 
 	ROS_INFO("About to send goal");
 	get_segmented_meshed_scene_client->sendGoal(goal,  boost::bind(&GraspitInterface::receivedMeshedSceneCB, this, _1, _2),
-		actionlib::SimpleActionClient<pc_pipeline_msgs::CompleteSceneAction>::SimpleActiveCallback(),
-		actionlib::SimpleActionClient<pc_pipeline_msgs::CompleteSceneAction>::SimpleFeedbackCallback());
+		actionlib::SimpleActionClient<scene_completion_msgs::CompleteSceneAction>::SimpleActiveCallback(),
+		actionlib::SimpleActionClient<scene_completion_msgs::CompleteSceneAction>::SimpleFeedbackCallback());
 
     }
 
-    void GraspitInterface::getSegmentedMeshesCB(const pc_pipeline_msgs::CompleteSceneResultConstPtr& result)
+    void GraspitInterface::getSegmentedMeshesCB(const scene_completion_msgs::CompleteSceneResultConstPtr& result)
     {
 
 	ROS_INFO("Entering getSegmentedMeshesCB");
@@ -310,7 +310,7 @@ namespace GraspitInterface
 
 
     void GraspitInterface::receivedMeshedSceneCB(const actionlib::SimpleClientGoalState& state,
-	    const pc_pipeline_msgs::CompleteSceneResultConstPtr& result)
+	    const scene_completion_msgs::CompleteSceneResultConstPtr& result)
 	//const graspit_interface::GetSegmentedMeshedSceneResultConstPtr& result)
     {
 	ROS_INFO("Sucessfully recieved meshed scene");

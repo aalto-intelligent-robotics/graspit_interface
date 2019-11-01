@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib
     actionlib_msgs
     graspit_msgs
-    pc_pipeline_msgs 
+    scene_completion_msgs 
     )
 
 ## System dependencies are found with CMake's conventions
