@@ -1,0 +1,15 @@
+# Goal
+string filename 
+string planner
+string method
+geometry_msgs/Vector3 meshOffset
+int8 numBestGrasps
+---
+# Result
+bool success
+int32[] bestEpsGrasps
+int32[] bestVolGrasps
+sensor_msgs/JointState[] handJointStates 
+geometry_msgs/Pose[] handPoses
+---
+# Feedback 

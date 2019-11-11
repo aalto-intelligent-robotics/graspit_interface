@@ -20,14 +20,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Qt4 COMPONENTS QtCore QtGui  REQUIRED)
-find_package(PCL 1.2 REQUIRED)
-
+find_package(PCL 1.8 REQUIRED)
+find_package(graspit)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
-include_directories(/home/jlundell/myapps/include)
-find_package(graspit)
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -117,6 +116,7 @@ find_package(graspit)
    DIRECTORY action
    FILES
    PlanGrasps.action
+   PlanXBestGrasps.action
    GetSegmentedMeshedScene.action
    CompleteMesh.action
  )
