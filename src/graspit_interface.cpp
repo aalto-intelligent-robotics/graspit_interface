@@ -84,7 +84,7 @@ int GraspitInterface::init(int argc, char **argv) {
   nh->getParam("/Render", render_graphics);
   nh->getParam("/Grasp_Planner", grasp_planning_method);
   nh->getParam("/Number_of_Best_Grasp", number_of_best_grasps_to_return);
-  nh->getParam("/Shape_Completion_Method", shape_completion_method);
+  nh->getParam("/Rank_Grasps_on_Samples", rank_grasps_on_samples);
   addObject_srv =
       nh->advertiseService("addObject", &GraspitInterface::addObjectCB, this);
 
@@ -275,13 +275,12 @@ void GraspitInterface::onGenerateGraspButtonPressed() {
   ROS_INFO("onGenerateGraspButtonPressed\n");
   graspit_interface::PlanXBestGraspsGoal goal;
   goal.filename = mean_mesh_file_path;
-  goal.meshOffset = mesh_offset;
-  ROS_INFO("Generate grasps with method %s, planner %s, and number of "
-           "best grasps %d",
-           shape_completion_method.c_str(), grasp_planning_method.c_str(),
-           number_of_best_grasps_to_return);
-  goal.method = shape_completion_method;
-  goal.numBestGrasps = number_of_best_grasps_to_return;
+  goal.mesh_offset = mesh_offset;
+  ROS_INFO("Generate grasps with the %s planner and returning the %d best "
+           "grasps",
+           grasp_planning_method.c_str(), number_of_best_grasps_to_return);
+  goal.rank_grasps_on_samples = rank_grasps_on_samples;
+  goal.number_of_top_x_grasps_to_return = number_of_best_grasps_to_return;
   goal.planner = grasp_planning_method;
   ROS_INFO("About to send goal");
   plan_x_best_grasps_action_client->sendGoal(
@@ -297,10 +296,10 @@ void GraspitInterface::planXBestGraspsCB(
     const graspit_interface::PlanXBestGraspsResultConstPtr &result) {
   ROS_INFO("Entering planBestGraspCB");
   ROS_INFO("%d", result->success);
-  indices_of_best_epsilon_grasps = result->bestEpsGrasps;
-  indices_of_best_volume_grasps = result->bestVolGrasps;
-  gripper_pose_for_all_grasps = result->handPoses;
-  gripper_joint_state_for_all_grasps = result->handJointStates;
+  indices_of_best_epsilon_grasps = result->top_x_epsilon_quality_grasps;
+  indices_of_best_volume_grasps = result->top_x_volume_quality_grasps;
+  gripper_pose_for_all_grasps = result->hand_poses;
+  gripper_joint_state_for_all_grasps = result->hand_joint_states;
 }
 
 void GraspitInterface::getSegmentedMeshesCB(

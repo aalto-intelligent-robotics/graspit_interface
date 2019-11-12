@@ -80,7 +80,7 @@ private:
 
   std::string grasp_planning_method;
   int number_of_best_grasps_to_return;
-  std::string shape_completion_method;
+  bool rank_grasps_on_samples;
 
   std::vector<int> indices_of_best_epsilon_grasps;
   std::vector<int> indices_of_best_volume_grasps;
