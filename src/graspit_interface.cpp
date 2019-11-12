@@ -195,9 +195,12 @@ int GraspitInterface::init(int argc, char **argv) {
   ROS_INFO("MAKING SHAPE COMPLETION UI");
   QPushButton *shapeCompleteSceneButton = new QPushButton("Scene Completion");
   QPushButton *generateGraspButton = new QPushButton("Generate Grasps");
+  QPushButton *executeHighestRankedGraspButton =
+      new QPushButton("Execute Best Grasp");
 
   shapeCompleteSceneButton->setDefault(true);
   generateGraspButton->setDefault(true);
+  executeHighestRankedGraspButton->setDefault(true);
 
   QWidget *shapeCompletionControlBox = new QWidget();
 
@@ -208,8 +211,9 @@ int GraspitInterface::init(int argc, char **argv) {
 
   mainLayout->addWidget(shapeCompleteSceneButton, 0, 0);
   mainLayout->addWidget(generateGraspButton, 1, 0);
-  mainLayout->addWidget(scene_completion_time, 2, 0);
-  mainLayout->addWidget(grasp_planning_time, 3, 0);
+  mainLayout->addWidget(executeHighestRankedGraspButton, 2, 0);
+  mainLayout->addWidget(scene_completion_time, 3, 0);
+  mainLayout->addWidget(grasp_planning_time, 4, 0);
   shapeCompletionControlBox->setLayout(mainLayout);
 
   // shapeCompletionControlBox->resize(QSize(200,100));
@@ -220,6 +224,9 @@ int GraspitInterface::init(int argc, char **argv) {
                    SLOT(onShapeCompleteSceneButtonPressed()));
   QObject::connect(generateGraspButton, SIGNAL(clicked()), this,
                    SLOT(onGenerateGraspButtonPressed()));
+  QObject::connect(executeHighestRankedGraspButton, SIGNAL(clicked()), this,
+                   SLOT(onExecuteHighestRankedGraspButtonPressed()));
+
   ROS_INFO("GraspIt interface successfully initialized!");
 
   return 0;
@@ -289,6 +296,11 @@ void GraspitInterface::onGenerateGraspButtonPressed() {
           graspit_interface::PlanXBestGraspsAction>::SimpleActiveCallback(),
       actionlib::SimpleActionClient<
           graspit_interface::PlanXBestGraspsAction>::SimpleFeedbackCallback());
+}
+
+void GraspitInterface::onexecutehighestrankedgraspbuttonpressed() {
+  ROS_INFO("onExecuteHighestRankedGraspButtonPressed\n");
+  // TODO: Publish the best grasp to a topic
 }
 
 void GraspitInterface::planXBestGraspsCB(

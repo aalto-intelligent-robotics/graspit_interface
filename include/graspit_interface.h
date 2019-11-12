@@ -336,6 +336,7 @@ Q_SIGNALS:
 public slots:
   void onShapeCompleteSceneButtonPressed();
   void onGenerateGraspButtonPressed();
+  void onexecutehighestrankedgraspbuttonpressed();
 };
 
 } // namespace GraspitInterface
