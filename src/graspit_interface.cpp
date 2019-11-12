@@ -81,10 +81,10 @@ int GraspitInterface::init(int argc, char **argv) {
   }
 
   nh = new ros::NodeHandle(node_name);
-  nh->getParam("Render", render_graphics);
-  nh->getParam("Grasp_Planner", grasp_planning_method);
-  nh->getParam("Number_of_Best_Grasp", number_of_best_grasps_to_return);
-  nh->getParam("Rank_Grasps_on_Samples", rank_grasps_on_samples);
+  nh->getParam("/Render", render_graphics);
+  nh->getParam("/Grasp_Planner", grasp_planning_method);
+  nh->getParam("/Number_of_Best_Grasp", number_of_best_grasps_to_return);
+  nh->getParam("/Rank_Grasps_on_Samples", rank_grasps_on_samples);
   addObject_srv =
       nh->advertiseService("addObject", &GraspitInterface::addObjectCB, this);
 
