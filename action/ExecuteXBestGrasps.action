@@ -1,0 +1,12 @@
+# Goal
+int32[] indices_of_best_epsilon_grasps 
+int32[] indices_of_best_volume_grasps 
+sensor_msgs/JointState[] gripper_joint_state_for_all_grasps
+geometry_msgs/Pose[] gripper_pose_for_all_grasps
+---
+# Result
+bool success
+int32 final_grasp_index
+---
+# Feedback 
+int32 current_grasp

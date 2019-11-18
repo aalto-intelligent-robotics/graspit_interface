@@ -136,7 +136,13 @@ int GraspitInterface::init(int argc, char **argv) {
       scene_completion_msgs::CompleteSceneAction>(
       "/scene_completion/SceneCompletion", true);
   plan_x_best_grasps_action_client = new actionlib::SimpleActionClient<
-      graspit_interface::PlanXBestGraspsAction>("/planBestGrasp", true);
+      graspit_interface::PlanXBestGraspsAction>("/plan_best_grasp", true);
+  execute_x_best_grasps_action_client = new actionlib::SimpleActionClient<
+      graspit_interface::ExecuteXBestGraspsAction>("/execute_best_grasps",
+                                                   true);
+  simulation_experiment_action_client = new actionlib::SimpleActionClient<
+      graspit_interface::SimulationExperimentAction>("/simulation_experiment",
+                                                     true);
 
   meshed_scene_repub =
       nh->advertise<scene_completion_msgs::CompleteSceneResult>(
@@ -194,13 +200,16 @@ int GraspitInterface::init(int argc, char **argv) {
   srand(1);
   ROS_INFO("MAKING SHAPE COMPLETION UI");
   QPushButton *shapeCompleteSceneButton = new QPushButton("Scene Completion");
-  QPushButton *generateGraspButton = new QPushButton("Generate Grasps");
+  QPushButton *generateGraspsButton = new QPushButton("Generate Grasps");
   QPushButton *executeHighestRankedGraspButton =
       new QPushButton("Execute Best Grasp");
+  QPushButton *simulationExperimentButton =
+      new QPushButton("Do Simulation Experiment");
 
   shapeCompleteSceneButton->setDefault(true);
-  generateGraspButton->setDefault(true);
+  generateGraspsButton->setDefault(true);
   executeHighestRankedGraspButton->setDefault(true);
+  simulationExperimentButton->setDefault(true);
 
   QWidget *shapeCompletionControlBox = new QWidget();
 
@@ -210,22 +219,23 @@ int GraspitInterface::init(int argc, char **argv) {
   QGridLayout *mainLayout = new QGridLayout;
 
   mainLayout->addWidget(shapeCompleteSceneButton, 0, 0);
-  mainLayout->addWidget(generateGraspButton, 1, 0);
+  mainLayout->addWidget(generateGraspsButton, 1, 0);
   mainLayout->addWidget(executeHighestRankedGraspButton, 2, 0);
-  mainLayout->addWidget(scene_completion_time, 3, 0);
-  mainLayout->addWidget(grasp_planning_time, 4, 0);
+  mainLayout->addWidget(simulationExperimentButton, 3, 0);
+  mainLayout->addWidget(scene_completion_time, 4, 0);
+  mainLayout->addWidget(grasp_planning_time, 5, 0);
   shapeCompletionControlBox->setLayout(mainLayout);
-
-  // shapeCompletionControlBox->resize(QSize(200,100));
 
   shapeCompletionControlBox->show();
 
   QObject::connect(shapeCompleteSceneButton, SIGNAL(clicked()), this,
                    SLOT(onShapeCompleteSceneButtonPressed()));
-  QObject::connect(generateGraspButton, SIGNAL(clicked()), this,
-                   SLOT(onGenerateGraspButtonPressed()));
+  QObject::connect(generateGraspsButton, SIGNAL(clicked()), this,
+                   SLOT(onGenerateGraspsButtonPressed()));
   QObject::connect(executeHighestRankedGraspButton, SIGNAL(clicked()), this,
                    SLOT(onExecuteHighestRankedGraspButtonPressed()));
+  QObject::connect(simulationExperimentButton, SIGNAL(clicked()), this,
+                   SLOT(onSimulationExperimentButtonPressed()));
 
   ROS_INFO("GraspIt interface successfully initialized!");
 
@@ -278,42 +288,6 @@ void GraspitInterface::onShapeCompleteSceneButtonPressed() {
           SimpleFeedbackCallback());
 }
 
-void GraspitInterface::onGenerateGraspButtonPressed() {
-  ROS_INFO("onGenerateGraspButtonPressed\n");
-  graspit_interface::PlanXBestGraspsGoal goal;
-  goal.filename = mean_mesh_file_path;
-  goal.mesh_offset = mesh_offset;
-  ROS_INFO("Generate grasps with the %s planner and returning the %d best "
-           "grasps",
-           grasp_planning_method.c_str(), number_of_best_grasps_to_return);
-  goal.rank_grasps_on_samples = rank_grasps_on_samples;
-  goal.number_of_top_x_grasps_to_return = number_of_best_grasps_to_return;
-  goal.planner = grasp_planning_method;
-  ROS_INFO("About to send goal");
-  plan_x_best_grasps_action_client->sendGoal(
-      goal, boost::bind(&GraspitInterface::planXBestGraspsCB, this, _1, _2),
-      actionlib::SimpleActionClient<
-          graspit_interface::PlanXBestGraspsAction>::SimpleActiveCallback(),
-      actionlib::SimpleActionClient<
-          graspit_interface::PlanXBestGraspsAction>::SimpleFeedbackCallback());
-}
-
-void GraspitInterface::onexecutehighestrankedgraspbuttonpressed() {
-  ROS_INFO("onExecuteHighestRankedGraspButtonPressed\n");
-  // TODO: Publish the best grasp to a topic
-}
-
-void GraspitInterface::planXBestGraspsCB(
-    const actionlib::SimpleClientGoalState &state,
-    const graspit_interface::PlanXBestGraspsResultConstPtr &result) {
-  ROS_INFO("Entering planBestGraspCB");
-  ROS_INFO("%d", result->success);
-  indices_of_best_epsilon_grasps = result->top_x_epsilon_quality_grasps;
-  indices_of_best_volume_grasps = result->top_x_volume_quality_grasps;
-  gripper_pose_for_all_grasps = result->hand_poses;
-  gripper_joint_state_for_all_grasps = result->hand_joint_states;
-}
-
 void GraspitInterface::getSegmentedMeshesCB(
     const scene_completion_msgs::CompleteSceneResultConstPtr &result) {
 
@@ -357,6 +331,168 @@ void GraspitInterface::receivedMeshedSceneCB(
   // TODO: Return the time it takes to complete the mesh
   // scene_segmentation_time->setText(QString("Scene Segmentation Time (ms): ")
   //+ QString::number(result->completion_time));
+}
+
+void GraspitInterface::onGenerateGraspsButtonPressed() {
+  ROS_INFO("onGenerateGraspsButtonPressed\n");
+  ROS_INFO("Generate grasps with the %s planner and returning the %d best "
+           "grasps",
+           grasp_planning_method.c_str(), number_of_best_grasps_to_return);
+
+  graspit_interface::PlanXBestGraspsGoal goal;
+  goal.filename = mean_mesh_file_path;
+  goal.mesh_offset = mesh_offset;
+  goal.rank_grasps_on_samples = rank_grasps_on_samples;
+  goal.number_of_top_x_grasps_to_return = number_of_best_grasps_to_return;
+  goal.planner = grasp_planning_method;
+  ROS_INFO("About to send goal");
+  plan_x_best_grasps_action_client->sendGoal(
+      goal, boost::bind(&GraspitInterface::planXBestGraspsCB, this, _1, _2),
+      actionlib::SimpleActionClient<
+          graspit_interface::PlanXBestGraspsAction>::SimpleActiveCallback(),
+      actionlib::SimpleActionClient<
+          graspit_interface::PlanXBestGraspsAction>::SimpleFeedbackCallback());
+}
+
+void GraspitInterface::planXBestGraspsCB(
+    const actionlib::SimpleClientGoalState &state,
+    const graspit_interface::PlanXBestGraspsResultConstPtr &result) {
+  ROS_INFO("Entering planBestGraspCB");
+  ROS_INFO("%d", result->success);
+  indices_of_best_epsilon_grasps = result->top_x_epsilon_quality_grasps;
+  indices_of_best_volume_grasps = result->top_x_volume_quality_grasps;
+  gripper_pose_for_all_grasps = result->hand_poses;
+  gripper_joint_state_for_all_grasps = result->hand_joint_states;
+}
+
+void GraspitInterface::onSimulationExperimentButtonPressed() {
+  ROS_INFO("onSimulationExperimentButtonPressed\n");
+
+  QWidget *simulationExperimentControlBox = new QWidget();
+
+  QGridLayout *mainLayout = new QGridLayout;
+
+  QRadioButton *evaluate_on_shape_samples_radio_button =
+      new QRadioButton(tr("Evaluate on shape samples"));
+  QPushButton *ground_truth_meshes_button =
+      new QPushButton(tr("&Folder containing ground truth meshes"));
+  QPushButton *shape_completed_meshes_button =
+      new QPushButton(tr("&Folder containing shape completed meshes"));
+  QPushButton *storage_folder_button =
+      new QPushButton(tr("&Folder where to save the results"));
+  QPushButton *run_button = new QPushButton(tr("&Run"));
+
+  QSignalMapper *signal_mapper = new QSignalMapper(this);
+  signal_mapper->setMapping(ground_truth_meshes_button, 0);
+  signal_mapper->setMapping(shape_completed_meshes_button, 1);
+  signal_mapper->setMapping(storage_folder_button, 2);
+
+  QObject::connect(ground_truth_meshes_button, SIGNAL(clicked()), signal_mapper,
+                   SLOT(map()));
+  QObject::connect(shape_completed_meshes_button, SIGNAL(clicked()),
+                   signal_mapper, SLOT(map()));
+  QObject::connect(storage_folder_button, SIGNAL(clicked()), signal_mapper,
+                   SLOT(map()));
+  QObject::connect(signal_mapper, SIGNAL(mapped(int)), this,
+                   SLOT(onBrowseButtonPressed(int)));
+  QObject::connect(evaluate_on_shape_samples_radio_button, SIGNAL(clicked()),
+                   this, SLOT(onEvaluateOnShapeSamplesRadioButtonPressed()));
+  QObject::connect(run_button, SIGNAL(clicked()), this,
+                   SLOT(onRunButtonPressed()));
+
+  evaluate_on_shape_samples_radio_button->setChecked(false);
+  mainLayout->addWidget(evaluate_on_shape_samples_radio_button);
+  mainLayout->addWidget(ground_truth_meshes_button);
+  mainLayout->addWidget(shape_completed_meshes_button);
+  mainLayout->addWidget(storage_folder_button);
+  mainLayout->addWidget(run_button);
+  simulationExperimentControlBox->setLayout(mainLayout);
+
+  simulationExperimentControlBox->show();
+}
+
+void GraspitInterface::onEvaluateOnShapeSamplesRadioButtonPressed() {
+  evaluate_on_shape_samples = !evaluate_on_shape_samples;
+}
+
+void GraspitInterface::onRunButtonPressed() {
+  graspit_interface::SimulationExperimentGoal goal;
+  goal.path_to_ground_truth_meshes = file_path_to_ground_truth_meshes;
+  goal.path_to_shape_completed_meshes = file_path_to_shape_completed_meshes;
+  goal.path_to_save_location = file_path_to_save_location;
+  goal.evaluate_on_shape_samples = evaluate_on_shape_samples;
+  ROS_INFO("About to send goal");
+  simulation_experiment_action_client->sendGoal(
+      goal,
+      boost::bind(&GraspitInterface::simulationExperimentCB, this, _1, _2),
+      actionlib::SimpleActionClient<
+          graspit_interface::SimulationExperimentAction>::
+          SimpleActiveCallback(),
+      actionlib::SimpleActionClient<
+          graspit_interface::SimulationExperimentAction>::
+          SimpleFeedbackCallback());
+}
+
+void GraspitInterface::simulationExperimentCB(
+    const actionlib::SimpleClientGoalState &state,
+    const graspit_interface::SimulationExperimentResultConstPtr &result) {
+  ROS_INFO("Entering planBestGraspCB");
+  ROS_INFO("%d", result->success);
+}
+
+void GraspitInterface::onBrowseButtonPressed(int id) {
+  QString directory =
+      QDir::toNativeSeparators(QFileDialog::getExistingDirectory(
+          0, tr("Find Files"), QDir::currentPath()));
+  if (id == 0)
+    file_path_to_ground_truth_meshes = directory.toStdString();
+  else if (id == 1)
+    file_path_to_shape_completed_meshes = directory.toStdString();
+  else if (id == 2)
+    file_path_to_save_location = directory.toStdString();
+}
+
+void GraspitInterface::onExecuteHighestRankedGraspButtonPressed() {
+  ROS_INFO("onExecuteHighestRankedGraspButtonPressed\n");
+  graspit_interface::ExecuteXBestGraspsGoal goal;
+  goal.indices_of_best_epsilon_grasps = indices_of_best_epsilon_grasps;
+  goal.indices_of_best_volume_grasps = indices_of_best_volume_grasps;
+  goal.gripper_pose_for_all_grasps = gripper_pose_for_all_grasps;
+  goal.gripper_joint_state_for_all_grasps = gripper_joint_state_for_all_grasps;
+
+  ROS_INFO(
+      "Calling the execute_best_grasp service which executes the best grasp on "
+      "the robot. This service needs to be implemented by the user");
+  ROS_INFO("About to send goal");
+  execute_x_best_grasps_action_client->sendGoal(
+      goal, boost::bind(&GraspitInterface::executeXBestGraspsCB, this, _1, _2),
+      actionlib::SimpleActionClient<
+          graspit_interface::ExecuteXBestGraspsAction>::SimpleActiveCallback(),
+      boost::bind(&GraspitInterface::executeXBestGraspsFeedback, this, _1));
+}
+
+void GraspitInterface::executeXBestGraspsCB(
+    const actionlib::SimpleClientGoalState &state,
+    const graspit_interface::ExecuteXBestGraspsResultConstPtr &result) {
+  ROS_INFO("Entering ExecuteXBestGraspsCB");
+  ROS_INFO("%d", result->success);
+  visualizeGrasp(gripper_joint_state_for_all_grasps[result->final_grasp_index],
+                 gripper_pose_for_all_grasps[result->final_grasp_index]);
+}
+
+void GraspitInterface::executeXBestGraspsFeedback(
+    const graspit_interface::ExecuteXBestGraspsFeedbackConstPtr &feedback) {
+  ROS_INFO("Entering executeXBestGraspsFeedback");
+  int current_grasp_index = feedback->current_grasp;
+  visualizeGrasp(gripper_joint_state_for_all_grasps[current_grasp_index],
+                 gripper_pose_for_all_grasps[current_grasp_index]);
+}
+
+void GraspitInterface::visualizeGrasp(
+    const sensor_msgs::JointState &gripper_joints,
+    const geometry_msgs::Pose &gripper_pose) {
+  ROS_INFO("Visualizing grasps on mean mesh");
+  // TODO: visualize the grasp
 }
 
 void GraspitInterface::addObject(graspit_msgs::ObjectInfo object) {
@@ -444,9 +580,6 @@ void GraspitInterface::addMesh(QString mesh_index, shape_msgs::Mesh mesh,
       IVScaleTran->scaleFactor.setValue(AXIS_SCALE, AXIS_SCALE, AXIS_SCALE);
       IVGeomRoot->insertChild(IVScaleTran, 0);
 
-      // ROS_INFO("offsetting mesh\n");
-      // transf *t =	new transf(mat3::Identity(), vec3(offset.x, offset.y,
-      // offset.z)); b->setTran(*t);
       ROS_INFO("Adding mean mesh to main world\n");
       graspitCore->getWorld()->addBody(b);
       ROS_INFO("Added Mesh: %s", b->getName().toStdString().c_str());

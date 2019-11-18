@@ -59,9 +59,11 @@
 
 #include <graspit_msgs/ObjectInfo.h>
 // ActionServer includes
+#include <graspit_interface/ExecuteXBestGraspsAction.h>
 #include <graspit_interface/GetSegmentedMeshedSceneAction.h>
 #include <graspit_interface/PlanGraspsAction.h>
 #include <graspit_interface/PlanXBestGraspsAction.h>
+#include <graspit_interface/SimulationExperimentAction.h>
 #endif
 
 #define AXIS_SCALE 1000
@@ -77,6 +79,10 @@ class GraspitInterface : public QObject, public Plugin {
 
 private:
   bool render_graphics = true;
+  bool evaluate_on_shape_samples = false;
+  std::string file_path_to_ground_truth_meshes;
+  std::string file_path_to_shape_completed_meshes;
+  std::string file_path_to_save_location;
 
   std::string grasp_planning_method;
   int number_of_best_grasps_to_return;
@@ -142,8 +148,14 @@ private:
   graspit_interface::PlanGraspsResult result_;
   graspit_interface::PlanGraspsGoal goal;
 
+  actionlib::SimpleActionClient<graspit_interface::ExecuteXBestGraspsAction>
+      *execute_x_best_grasps_action_client;
+
   actionlib::SimpleActionClient<graspit_interface::PlanXBestGraspsAction>
       *plan_x_best_grasps_action_client;
+
+  actionlib::SimpleActionClient<graspit_interface::SimulationExperimentAction>
+      *simulation_experiment_action_client;
 
   actionlib::SimpleActionClient<scene_completion_msgs::CompleteSceneAction>
       *shape_complete_scene_action_client;
@@ -165,6 +177,8 @@ private:
 
   Body *selected_body;
 
+  void visualizeGrasp(const sensor_msgs::JointState &gripper_joints,
+                      const geometry_msgs::Pose &gripper_pose);
   void addToWorld(const QString modelname, const QString object_name,
                   const transf object_pose);
   void addObject(graspit_msgs::ObjectInfo object);
@@ -282,6 +296,10 @@ private:
 
   void saveMesh(const QString filepath, const QString filename,
                 const pcl::PolygonMesh *pcl_mesh, const bool is_mean = false);
+  // ActionClient Feedback
+  void executeXBestGraspsFeedback(
+      const graspit_interface::ExecuteXBestGraspsFeedbackConstPtr &feedback);
+
   // Convenience functions for converting between pose types:
   inline geometry_msgs::Pose transfToRosMsg(transf pose) {
     geometry_msgs::Pose ret;
@@ -320,6 +338,12 @@ public:
   void planXBestGraspsCB(
       const actionlib::SimpleClientGoalState &state,
       const graspit_interface::PlanXBestGraspsResultConstPtr &result);
+  void executeXBestGraspsCB(
+      const actionlib::SimpleClientGoalState &state,
+      const graspit_interface::ExecuteXBestGraspsResultConstPtr &result);
+  void simulationExperimentCB(
+      const actionlib::SimpleClientGoalState &state,
+      const graspit_interface::SimulationExperimentResultConstPtr &result);
 
 public Q_SLOTS:
 
@@ -335,8 +359,12 @@ Q_SIGNALS:
 
 public slots:
   void onShapeCompleteSceneButtonPressed();
-  void onGenerateGraspButtonPressed();
-  void onexecutehighestrankedgraspbuttonpressed();
+  void onGenerateGraspsButtonPressed();
+  void onExecuteHighestRankedGraspButtonPressed();
+  void onSimulationExperimentButtonPressed();
+  void onBrowseButtonPressed(int);
+  void onRunButtonPressed();
+  void onEvaluateOnShapeSamplesRadioButtonPressed();
 };
 
 } // namespace GraspitInterface
