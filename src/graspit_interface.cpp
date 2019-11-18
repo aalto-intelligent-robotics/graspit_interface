@@ -85,50 +85,50 @@ int GraspitInterface::init(int argc, char **argv) {
   nh->getParam("/Grasp_Planner", grasp_planning_method);
   nh->getParam("/Number_of_Best_Grasp", number_of_best_grasps_to_return);
   nh->getParam("/Rank_Grasps_on_Samples", rank_grasps_on_samples);
-  addObject_srv =
+  add_object_srv =
       nh->advertiseService("addObject", &GraspitInterface::addObjectCB, this);
 
-  getRobot_srv =
+  get_robot_srv =
       nh->advertiseService("getRobot", &GraspitInterface::getRobotCB, this);
-  getGraspableBody_srv = nh->advertiseService(
+  get_graspable_body_srv = nh->advertiseService(
       "getGraspableBody", &GraspitInterface::getGraspableBodyCB, this);
-  getBody_srv =
+  get_body_srv =
       nh->advertiseService("getBody", &GraspitInterface::getBodyCB, this);
-  getRobots_srv =
+  get_robots_srv =
       nh->advertiseService("getRobots", &GraspitInterface::getRobotsCB, this);
-  getGraspableBodies_srv = nh->advertiseService(
+  get_graspable_bodies_srv = nh->advertiseService(
       "getGraspableBodies", &GraspitInterface::getGraspableBodiesCB, this);
-  getBodies_srv =
+  get_bodies_srv =
       nh->advertiseService("getBodies", &GraspitInterface::getBodiesCB, this);
-  setRobotPose_srv = nh->advertiseService(
+  set_robot_pose_srv = nh->advertiseService(
       "setRobotPose", &GraspitInterface::setRobotPoseCB, this);
-  setBodyPose_srv = nh->advertiseService(
+  set_body_pose_srv = nh->advertiseService(
       "setBodyPose", &GraspitInterface::setBodyPoseCB, this);
-  setGraspableBodyPose_srv = nh->advertiseService(
+  set_graspable_body_pose_srv = nh->advertiseService(
       "setGraspableBodyPose", &GraspitInterface::setGraspableBodyPoseCB, this);
 
-  getDynamics_srv = nh->advertiseService(
+  get_dynamics_srv = nh->advertiseService(
       "getDynamics", &GraspitInterface::getDynamicsCB, this);
-  setDynamics_srv = nh->advertiseService(
+  set_dynamics_srv = nh->advertiseService(
       "setDynamics", &GraspitInterface::setDynamicsCB, this);
 
-  autoGrasp_srv =
+  auto_grasp_srv =
       nh->advertiseService("autoGrasp", &GraspitInterface::autoGraspCB, this);
-  autoOpen_srv =
+  auto_open_srv =
       nh->advertiseService("autoOpen", &GraspitInterface::autoOpenCB, this);
 
-  forceRobotDOF_srv = nh->advertiseService(
+  force_robot_dof_srv = nh->advertiseService(
       "forceRobotDof", &GraspitInterface::forceRobotDOFCB, this);
-  moveDOFToContacts_srv = nh->advertiseService(
+  move_dof_to_contacts_srv = nh->advertiseService(
       "moveDOFToContacts", &GraspitInterface::moveDOFToContactsCB, this);
-  setRobotDesiredDOF_srv = nh->advertiseService(
+  set_robot_desired_dof_srv = nh->advertiseService(
       "setRobotDesiredDOF", &GraspitInterface::setRobotDesiredDOFCB, this);
 
-  importRobot_srv = nh->advertiseService(
+  import_robot_srv = nh->advertiseService(
       "importRobot", &GraspitInterface::importRobotCB, this);
-  importObstacle_srv = nh->advertiseService(
+  import_obstacle_srv = nh->advertiseService(
       "importObstacle", &GraspitInterface::importObstacleCB, this);
-  importGraspableBody_srv = nh->advertiseService(
+  import_graspable_body_srv = nh->advertiseService(
       "importGraspableBody", &GraspitInterface::importGraspableBodyCB, this);
 
   // Shape completion stuff
@@ -150,41 +150,41 @@ int GraspitInterface::init(int argc, char **argv) {
   meshed_scene_sub =
       nh->subscribe("/get_segmented_meshed_scene", 10,
                     &GraspitInterface::getSegmentedMeshesCB, this);
-  clearWorld_srv =
+  clear_world_srv =
       nh->advertiseService("clearWorld", &GraspitInterface::clearWorldCB, this);
-  loadWorld_srv =
+  load_world_srv =
       nh->advertiseService("loadWorld", &GraspitInterface::loadWorldCB, this);
-  saveWorld_srv =
+  save_world_srv =
       nh->advertiseService("saveWorld", &GraspitInterface::saveWorldCB, this);
 
-  saveImage_srv =
+  save_image_srv =
       nh->advertiseService("saveImage", &GraspitInterface::saveImageCB, this);
-  toggleAllCollisions_srv = nh->advertiseService(
+  toggle_all_collisions_srv = nh->advertiseService(
       "toggleAllCollisions", &GraspitInterface::toggleAllCollisionsCB, this);
 
-  computeQuality_srv = nh->advertiseService(
+  compute_quality_srv = nh->advertiseService(
       "computeQuality", &GraspitInterface::computeQualityCB, this);
-  computeEnergy_srv = nh->advertiseService(
+  compute_energy_srv = nh->advertiseService(
       "computeEnergy", &GraspitInterface::computeEnergyCB, this);
 
-  approachToContact_srv = nh->advertiseService(
+  approach_to_contact_srv = nh->advertiseService(
       "approachToContact", &GraspitInterface::approachToContactCB, this);
-  findInitialContact_srv = nh->advertiseService(
+  find_initial_contact_srv = nh->advertiseService(
       "findInitialContact", &GraspitInterface::findInitialContactCB, this);
-  dynamicAutoGraspComplete_srv =
+  dynamic_auto_grasp_complete_srv =
       nh->advertiseService("dynamicAutoGraspComplete",
                            &GraspitInterface::dynamicAutoGraspCompleteCB, this);
 
-  plan_grasps_as =
+  plan_grasps_action_server =
       new actionlib::SimpleActionServer<graspit_interface::PlanGraspsAction>(
           *nh, "planGrasps",
           boost::bind(&GraspitInterface::PlanGraspsCB, this, _1), false);
-  plan_grasps_as->start();
+  plan_grasps_action_server->start();
 
-  firstTimeInMainLoop = true;
+  first_time_in_main_loop = true;
 
-  mPlanner = NULL;
-  mHandObjectState = NULL;
+  m_planner = NULL;
+  m_hand_object_state = NULL;
   clear_world_client =
       nh->serviceClient<graspit_interface::ClearWorld>("clearWorld");
   add_objects_client =
@@ -197,44 +197,44 @@ int GraspitInterface::init(int argc, char **argv) {
       nh->serviceClient<graspit_interface::SaveWorld>("saveWorld");
   add_object_client =
       nh->serviceClient<graspit_interface::AddObject>("addObject");
-  srand(1);
   ROS_INFO("MAKING SHAPE COMPLETION UI");
-  QPushButton *shapeCompleteSceneButton = new QPushButton("Scene Completion");
-  QPushButton *generateGraspsButton = new QPushButton("Generate Grasps");
-  QPushButton *executeHighestRankedGraspButton =
+  QPushButton *shape_complete_scene_button =
+      new QPushButton("Scene Completion");
+  QPushButton *generate_grasps_button = new QPushButton("Generate Grasps");
+  QPushButton *execute_highest_ranked_grasp_button =
       new QPushButton("Execute Best Grasp");
-  QPushButton *simulationExperimentButton =
+  QPushButton *simulation_experiment_button =
       new QPushButton("Do Simulation Experiment");
 
-  shapeCompleteSceneButton->setDefault(true);
-  generateGraspsButton->setDefault(true);
-  executeHighestRankedGraspButton->setDefault(true);
-  simulationExperimentButton->setDefault(true);
+  shape_complete_scene_button->setDefault(true);
+  generate_grasps_button->setDefault(true);
+  execute_highest_ranked_grasp_button->setDefault(true);
+  simulation_experiment_button->setDefault(true);
 
-  QWidget *shapeCompletionControlBox = new QWidget();
+  QWidget *shape_completion_control_box = new QWidget();
 
   scene_completion_time = new QLabel(tr("Scene Completion Time:"));
   grasp_planning_time = new QLabel(tr("Grasp Planning Time:"));
 
-  QGridLayout *mainLayout = new QGridLayout;
+  QGridLayout *main_layout = new QGridLayout;
 
-  mainLayout->addWidget(shapeCompleteSceneButton, 0, 0);
-  mainLayout->addWidget(generateGraspsButton, 1, 0);
-  mainLayout->addWidget(executeHighestRankedGraspButton, 2, 0);
-  mainLayout->addWidget(simulationExperimentButton, 3, 0);
-  mainLayout->addWidget(scene_completion_time, 4, 0);
-  mainLayout->addWidget(grasp_planning_time, 5, 0);
-  shapeCompletionControlBox->setLayout(mainLayout);
+  main_layout->addWidget(shape_complete_scene_button, 0, 0);
+  main_layout->addWidget(generate_grasps_button, 1, 0);
+  main_layout->addWidget(execute_highest_ranked_grasp_button, 2, 0);
+  main_layout->addWidget(simulation_experiment_button, 3, 0);
+  main_layout->addWidget(scene_completion_time, 4, 0);
+  main_layout->addWidget(grasp_planning_time, 5, 0);
+  shape_completion_control_box->setLayout(main_layout);
 
-  shapeCompletionControlBox->show();
+  shape_completion_control_box->show();
 
-  QObject::connect(shapeCompleteSceneButton, SIGNAL(clicked()), this,
+  QObject::connect(shape_complete_scene_button, SIGNAL(clicked()), this,
                    SLOT(onShapeCompleteSceneButtonPressed()));
-  QObject::connect(generateGraspsButton, SIGNAL(clicked()), this,
+  QObject::connect(generate_grasps_button, SIGNAL(clicked()), this,
                    SLOT(onGenerateGraspsButtonPressed()));
-  QObject::connect(executeHighestRankedGraspButton, SIGNAL(clicked()), this,
+  QObject::connect(execute_highest_ranked_grasp_button, SIGNAL(clicked()), this,
                    SLOT(onExecuteHighestRankedGraspButtonPressed()));
-  QObject::connect(simulationExperimentButton, SIGNAL(clicked()), this,
+  QObject::connect(simulation_experiment_button, SIGNAL(clicked()), this,
                    SLOT(onSimulationExperimentButtonPressed()));
 
   ROS_INFO("GraspIt interface successfully initialized!");
@@ -243,7 +243,7 @@ int GraspitInterface::init(int argc, char **argv) {
 }
 
 int GraspitInterface::mainLoop() {
-  if (firstTimeInMainLoop) {
+  if (first_time_in_main_loop) {
     // Planner Must be started by mainthread, so it cannot be
     // Started inside the callback for the action server.  I need to connect
     // these here So that when the signal is emitted, the slot function is
@@ -257,7 +257,7 @@ int GraspitInterface::mainLoop() {
     QObject::connect(this, SIGNAL(emitBuildFeedbackInMainThread()), this,
                      SLOT(buildFeedbackInMainThread()),
                      Qt::BlockingQueuedConnection);
-    firstTimeInMainLoop = false;
+    first_time_in_main_loop = false;
     ROS_INFO("Planner Signal/Slots connected");
   }
 
@@ -295,7 +295,7 @@ void GraspitInterface::getSegmentedMeshesCB(
   if (QThread::currentThread() != QApplication::instance()->thread()) {
     meshed_scene_repub.publish(result);
   } else {
-    ROS_INFO("Recieved %lu mean meshes and %lu sampled meshes",
+    ROS_INFO("Received %lu mean meshes and %lu sampled meshes",
              result->mean_meshes.size(), result->sample_meshes.size());
     ROS_INFO("Adding only mean meshes to the scene");
     for (int i = 0; i < result->mean_meshes.size(); i++) {
@@ -317,7 +317,7 @@ void GraspitInterface::getSegmentedMeshesCB(
     }
   }
 
-  ROS_INFO("Sucessfully recieved meshed scene");
+  ROS_INFO("Successfully received meshed scene");
 }
 
 void GraspitInterface::receivedMeshedSceneCB(
@@ -368,9 +368,9 @@ void GraspitInterface::planXBestGraspsCB(
 void GraspitInterface::onSimulationExperimentButtonPressed() {
   ROS_INFO("onSimulationExperimentButtonPressed\n");
 
-  QWidget *simulationExperimentControlBox = new QWidget();
+  QWidget *simulation_experiment_control_box = new QWidget();
 
-  QGridLayout *mainLayout = new QGridLayout;
+  QGridLayout *main_layout = new QGridLayout;
 
   QRadioButton *evaluate_on_shape_samples_radio_button =
       new QRadioButton(tr("Evaluate on shape samples"));
@@ -401,14 +401,14 @@ void GraspitInterface::onSimulationExperimentButtonPressed() {
                    SLOT(onRunButtonPressed()));
 
   evaluate_on_shape_samples_radio_button->setChecked(false);
-  mainLayout->addWidget(evaluate_on_shape_samples_radio_button);
-  mainLayout->addWidget(ground_truth_meshes_button);
-  mainLayout->addWidget(shape_completed_meshes_button);
-  mainLayout->addWidget(storage_folder_button);
-  mainLayout->addWidget(run_button);
-  simulationExperimentControlBox->setLayout(mainLayout);
+  main_layout->addWidget(evaluate_on_shape_samples_radio_button);
+  main_layout->addWidget(ground_truth_meshes_button);
+  main_layout->addWidget(shape_completed_meshes_button);
+  main_layout->addWidget(storage_folder_button);
+  main_layout->addWidget(run_button);
+  simulation_experiment_control_box->setLayout(main_layout);
 
-  simulationExperimentControlBox->show();
+  simulation_experiment_control_box->show();
 }
 
 void GraspitInterface::onEvaluateOnShapeSamplesRadioButtonPressed() {
@@ -497,8 +497,8 @@ void GraspitInterface::visualizeGrasp(
 
 void GraspitInterface::addObject(graspit_msgs::ObjectInfo object) {
   ROS_INFO("Entering addObject function");
-  QString modelName(QString::fromStdString(object.model_name));
-  QString objectName(QString::fromStdString(object.object_name));
+  QString model_name(QString::fromStdString(object.model_name));
+  QString object_name(QString::fromStdString(object.object_name));
   transf object_pose = transf(Quaternion(object.object_pose.orientation.w,
                                          object.object_pose.orientation.x,
                                          object.object_pose.orientation.y,
@@ -506,15 +506,15 @@ void GraspitInterface::addObject(graspit_msgs::ObjectInfo object) {
                               vec3(object.object_pose.position.x * AXIS_SCALE,
                                    object.object_pose.position.y * AXIS_SCALE,
                                    object.object_pose.position.z * AXIS_SCALE));
-  ROS_INFO("Adding Model %s", modelName.toStdString().c_str());
-  ROS_INFO("Adding Model %s", objectName.toStdString().c_str());
-  addToWorld(modelName, objectName, object_pose);
+  ROS_INFO("Adding Model %s", model_name.toStdString().c_str());
+  ROS_INFO("Adding Model %s", object_name.toStdString().c_str());
+  addToWorld(model_name, object_name, object_pose);
 }
 
-void GraspitInterface::addToWorld(const QString modelname,
+void GraspitInterface::addToWorld(const QString model_name,
                                   const QString object_name,
                                   const transf object_pose) {
-  QString model_filename = modelname + QString(".xml");
+  QString model_filename = model_name + QString(".xml");
   ROS_INFO("model filename: %s", model_filename.toStdString().c_str());
 
   QString body_file =
@@ -556,18 +556,18 @@ void GraspitInterface::addMesh(QString mesh_index, shape_msgs::Mesh mesh,
   pcl::PolygonMesh *pcl_mesh = new pcl::PolygonMesh;
   meshMsgToVerticesTriangles(mesh, &vertices, &triangles, *pcl_mesh);
 
-  QString fullfilepath =
+  QString full_file_path =
       QString(getenv("GRASPIT")) + QString("/models/objects/");
   if (!is_mean) {
-    QString meshname = QString("mesh_sample_") + mesh_index;
+    QString mesh_name = QString("mesh_sample_") + mesh_index;
     ROS_INFO("This sampled mesh is only saved to an xml file.\n");
-    saveMesh(fullfilepath, meshname, pcl_mesh);
+    saveMesh(full_file_path, mesh_name, pcl_mesh);
   } else {
     GraspableBody *b = new GraspableBody(graspitCore->getWorld());
     if (b->loadGeometryMemory(vertices, triangles) == SUCCESS) {
       ROS_INFO("setting mesh name\n");
-      QString meshname = QString("mesh_mean_") + mesh_index;
-      b->setName(meshname);
+      QString mesh_name = QString("mesh_mean_") + mesh_index;
+      b->setName(mesh_name);
 
       ROS_INFO("About to add IVMAT\n");
       b->addIVMat(true);
@@ -586,7 +586,7 @@ void GraspitInterface::addMesh(QString mesh_index, shape_msgs::Mesh mesh,
 
       b->setFilename(QString("models/objects/") + b->getName() + ".xml");
 
-      saveMesh(fullfilepath, b->getName(), pcl_mesh, true);
+      saveMesh(full_file_path, b->getName(), pcl_mesh, true);
     } else {
       ROS_INFO("Failed to load mesh geometry; Mesh: %s",
                b->getName().toStdString().c_str());
@@ -594,25 +594,26 @@ void GraspitInterface::addMesh(QString mesh_index, shape_msgs::Mesh mesh,
   }
 }
 
-void GraspitInterface::saveMesh(const QString filepath, const QString filename,
+void GraspitInterface::saveMesh(const QString file_path, const QString filename,
                                 const pcl::PolygonMesh *pcl_mesh,
                                 const bool is_mean) {
 
   QString mesh_filename = filename + QString(".ply");
-  QString mesh_fullfilepath = filepath + mesh_filename;
+  QString mesh_full_file_path = file_path + mesh_filename;
   if (is_mean) {
-    mean_mesh_file_path = (filepath + filename).toStdString();
+    mean_mesh_file_path = (file_path + filename).toStdString();
   }
 
-  ROS_INFO("Saving in mesh file: %s", mesh_fullfilepath.toStdString().c_str());
+  ROS_INFO("Saving in mesh file: %s",
+           mesh_full_file_path.toStdString().c_str());
 
-  pcl::io::savePLYFileBinary(mesh_fullfilepath.toStdString().c_str(),
+  pcl::io::savePLYFileBinary(mesh_full_file_path.toStdString().c_str(),
                              *pcl_mesh);
 
-  QString xml_fullfilepath = filepath + filename + QString(".xml");
-  ROS_INFO("Saving in xml file: %s", xml_fullfilepath.toStdString().c_str());
+  QString xml_full_file_path = file_path + filename + QString(".xml");
+  ROS_INFO("Saving in xml file: %s", xml_full_file_path.toStdString().c_str());
   ROS_INFO("saving .xml");
-  QFile file(xml_fullfilepath);
+  QFile file(xml_full_file_path);
   file.open(QIODevice::WriteOnly | QIODevice::Text);
   ROS_INFO("opened .xml");
   QTextStream stream(&file);
@@ -668,9 +669,7 @@ bool GraspitInterface::getRobotCB(
       c.ps.header.frame_id = "world";
       c.ps.pose.position.x = contactInWorldFrame.translation().x() / AXIS_SCALE;
       c.ps.pose.position.y = contactInWorldFrame.translation().y() / AXIS_SCALE;
-      ;
       c.ps.pose.position.z = contactInWorldFrame.translation().z() / AXIS_SCALE;
-      ;
       c.ps.pose.orientation.w = contactInWorldFrame.rotation().w();
       c.ps.pose.orientation.x = contactInWorldFrame.rotation().x();
       c.ps.pose.orientation.y = contactInWorldFrame.rotation().y();
@@ -679,8 +678,8 @@ bool GraspitInterface::getRobotCB(
       response.robot.contacts.push_back(c);
     }
 
-    double *jointVals = new double[r->getNumJoints()];
-    r->getJointValues(jointVals);
+    double *joint_vals = new double[r->getNumJoints()];
+    r->getJointValues(joint_vals);
 
     sensor_msgs::JointState robot_joint_state = sensor_msgs::JointState();
     for (int i = 0; i < r->getNumJoints(); i++) {
@@ -691,7 +690,7 @@ bool GraspitInterface::getRobotCB(
       joint_name = convert.str();
 
       robot_joint_state.name.push_back(joint_name);
-      robot_joint_state.position.push_back(jointVals[i]);
+      robot_joint_state.position.push_back(joint_vals[i]);
       robot_joint_state.velocity.push_back(0);
       robot_joint_state.effort.push_back(0);
     }
@@ -706,20 +705,18 @@ bool GraspitInterface::getRobotCB(
       BodySensor *s = r->getSensor(i);
       transf t = s->getSensorTran();
 
-      geometry_msgs::PoseStamped poseStamped = geometry_msgs::PoseStamped();
+      geometry_msgs::PoseStamped pose_stamped = geometry_msgs::PoseStamped();
 
-      poseStamped.header.frame_id = "world";
-      poseStamped.pose.position.x = t.translation().x() / AXIS_SCALE;
-      poseStamped.pose.position.y = t.translation().y() / AXIS_SCALE;
-      ;
-      poseStamped.pose.position.z = t.translation().z() / AXIS_SCALE;
-      ;
-      poseStamped.pose.orientation.w = t.rotation().w();
-      poseStamped.pose.orientation.x = t.rotation().x();
-      poseStamped.pose.orientation.y = t.rotation().y();
-      poseStamped.pose.orientation.z = t.rotation().z();
+      pose_stamped.header.frame_id = "world";
+      pose_stamped.pose.position.x = t.translation().x() / AXIS_SCALE;
+      pose_stamped.pose.position.y = t.translation().y() / AXIS_SCALE;
+      pose_stamped.pose.position.z = t.translation().z() / AXIS_SCALE;
+      pose_stamped.pose.orientation.w = t.rotation().w();
+      pose_stamped.pose.orientation.x = t.rotation().x();
+      pose_stamped.pose.orientation.y = t.rotation().y();
+      pose_stamped.pose.orientation.z = t.rotation().z();
 
-      response.robot.tactile.sensor_poses.push_back(poseStamped);
+      response.robot.tactile.sensor_poses.push_back(pose_stamped);
       response.robot.tactile.sensor_forces.push_back(s->getNormalForce());
     }
 
@@ -769,9 +766,7 @@ bool GraspitInterface::getBodyCB(
 
     pose.position.x = t.translation().x() / AXIS_SCALE;
     pose.position.y = t.translation().y() / AXIS_SCALE;
-    ;
     pose.position.z = t.translation().z() / AXIS_SCALE;
-    ;
     pose.orientation.w = t.rotation().w();
     pose.orientation.x = t.rotation().x();
     pose.orientation.y = t.rotation().y();
@@ -818,17 +813,17 @@ bool GraspitInterface::setRobotPoseCB(
     response.result = response.RESULT_INVALID_ID;
     return true;
   } else {
-    vec3 newTranslation(request.pose.position.x * AXIS_SCALE,
-                        request.pose.position.y * AXIS_SCALE,
-                        request.pose.position.z * AXIS_SCALE);
+    vec3 new_translation(request.pose.position.x * AXIS_SCALE,
+                         request.pose.position.y * AXIS_SCALE,
+                         request.pose.position.z * AXIS_SCALE);
 
-    Quaternion newRotation(
+    Quaternion new_rotation(
         request.pose.orientation.w, request.pose.orientation.x,
         request.pose.orientation.y, request.pose.orientation.z);
 
-    transf newTransform(newRotation, newTranslation);
+    transf new_transform(new_rotation, new_translation);
 
-    graspitCore->getWorld()->getRobot(request.id)->setTran(newTransform);
+    graspitCore->getWorld()->getRobot(request.id)->setTran(new_transform);
     return true;
   }
 }
@@ -841,17 +836,17 @@ bool GraspitInterface::setGraspableBodyPoseCB(
     return true;
   } else {
 
-    vec3 newTranslation(request.pose.position.x * AXIS_SCALE,
-                        request.pose.position.y * AXIS_SCALE,
-                        request.pose.position.z * AXIS_SCALE);
+    vec3 new_translation(request.pose.position.x * AXIS_SCALE,
+                         request.pose.position.y * AXIS_SCALE,
+                         request.pose.position.z * AXIS_SCALE);
 
-    Quaternion newRotation(
+    Quaternion new_rotation(
         request.pose.orientation.w, request.pose.orientation.x,
         request.pose.orientation.y, request.pose.orientation.z);
 
-    transf newTransform(newRotation, newTranslation);
+    transf new_transform(new_rotation, new_translation);
 
-    graspitCore->getWorld()->getGB(request.id)->setTran(newTransform);
+    graspitCore->getWorld()->getGB(request.id)->setTran(new_transform);
     return true;
   }
 }
@@ -864,17 +859,17 @@ bool GraspitInterface::setBodyPoseCB(
     return true;
   } else {
 
-    vec3 newTranslation(request.pose.position.x * AXIS_SCALE,
-                        request.pose.position.y * AXIS_SCALE,
-                        request.pose.position.z * AXIS_SCALE);
+    vec3 new_translation(request.pose.position.x * AXIS_SCALE,
+                         request.pose.position.y * AXIS_SCALE,
+                         request.pose.position.z * AXIS_SCALE);
 
-    Quaternion newRotation(
+    Quaternion new_rotation(
         request.pose.orientation.w, request.pose.orientation.x,
         request.pose.orientation.y, request.pose.orientation.z);
 
-    transf newTransform(newRotation, newTranslation);
+    transf new_transform(new_rotation, new_translation);
 
-    graspitCore->getWorld()->getBody(request.id)->setTran(newTransform);
+    graspitCore->getWorld()->getBody(request.id)->setTran(new_transform);
     return true;
   }
 }
@@ -1006,16 +1001,16 @@ bool GraspitInterface::importRobotCB(
     response.result = response.RESULT_FAILURE;
     return true;
   }
-  vec3 newTranslation(request.pose.position.x * AXIS_SCALE,
-                      request.pose.position.y * AXIS_SCALE,
-                      request.pose.position.z * AXIS_SCALE);
+  vec3 new_translation(request.pose.position.x * AXIS_SCALE,
+                       request.pose.position.y * AXIS_SCALE,
+                       request.pose.position.z * AXIS_SCALE);
 
-  Quaternion newRotation(request.pose.orientation.w, request.pose.orientation.x,
-                         request.pose.orientation.y,
-                         request.pose.orientation.z);
+  Quaternion new_rotation(
+      request.pose.orientation.w, request.pose.orientation.x,
+      request.pose.orientation.y, request.pose.orientation.z);
 
-  transf newTransform(newRotation, newTranslation);
-  r->setTran(newTransform);
+  transf new_transform(new_rotation, new_translation);
+  r->setTran(new_transform);
   r->setRenderGeometry(render_graphics);
   return true;
 }
@@ -1031,7 +1026,7 @@ bool GraspitInterface::importObstacleCB(
 
   Body *b = graspitCore->getWorld()->importBody(QString("Body"), filename);
   if (b == NULL) {
-    // Now try to load using unaltered filepath from request.
+    // Now try to load using unaltered file_path from request.
     b = graspitCore->getWorld()->importBody(QString("Body"),
                                             QString(request.filename.data()));
     if (b == NULL) {
@@ -1040,16 +1035,16 @@ bool GraspitInterface::importObstacleCB(
     }
   }
 
-  vec3 newTranslation(request.pose.position.x * AXIS_SCALE,
-                      request.pose.position.y * AXIS_SCALE,
-                      request.pose.position.z * AXIS_SCALE);
+  vec3 new_translation(request.pose.position.x * AXIS_SCALE,
+                       request.pose.position.y * AXIS_SCALE,
+                       request.pose.position.z * AXIS_SCALE);
 
-  Quaternion newRotation(request.pose.orientation.w, request.pose.orientation.x,
-                         request.pose.orientation.y,
-                         request.pose.orientation.z);
+  Quaternion new_rotation(
+      request.pose.orientation.w, request.pose.orientation.x,
+      request.pose.orientation.y, request.pose.orientation.z);
 
-  transf newTransform(newRotation, newTranslation);
-  b->setTran(newTransform);
+  transf new_transform(new_rotation, new_translation);
+  b->setTran(new_transform);
   return true;
 }
 
@@ -1064,7 +1059,7 @@ bool GraspitInterface::importGraspableBodyCB(
   Body *b =
       graspitCore->getWorld()->importBody(QString("GraspableBody"), filename);
   if (b == NULL) {
-    // Now try to load using unaltered filepath from request.
+    // Now try to load using unaltered file_path from request.
     b = graspitCore->getWorld()->importBody(QString("GraspableBody"),
                                             QString(request.filename.data()));
     if (b == NULL) {
@@ -1073,16 +1068,16 @@ bool GraspitInterface::importGraspableBodyCB(
     }
   }
 
-  vec3 newTranslation(request.pose.position.x * AXIS_SCALE,
-                      request.pose.position.y * AXIS_SCALE,
-                      request.pose.position.z * AXIS_SCALE);
+  vec3 new_translation(request.pose.position.x * AXIS_SCALE,
+                       request.pose.position.y * AXIS_SCALE,
+                       request.pose.position.z * AXIS_SCALE);
 
-  Quaternion newRotation(request.pose.orientation.w, request.pose.orientation.x,
-                         request.pose.orientation.y,
-                         request.pose.orientation.z);
+  Quaternion new_rotation(
+      request.pose.orientation.w, request.pose.orientation.x,
+      request.pose.orientation.y, request.pose.orientation.z);
 
-  transf newTransform(newRotation, newTranslation);
-  b->setTran(newTransform);
+  transf new_transform(new_rotation, new_translation);
+  b->setTran(new_transform);
 
   return true;
 }
@@ -1155,33 +1150,33 @@ bool GraspitInterface::toggleAllCollisionsCB(
 bool GraspitInterface::computeQualityCB(
     graspit_interface::ComputeQuality::Request &request,
     graspit_interface::ComputeQuality::Response &response) {
-  CollisionReport colReport;
+  CollisionReport col_report;
   // first test whether the hand is in collision now
-  int numCols = graspitCore->getWorld()->getCollisionReport(&colReport);
+  int num_cols = graspitCore->getWorld()->getCollisionReport(&col_report);
   // if it is in collision, then there should be no reason to calculate the
   // quality
-  if (numCols > 0) {
+  if (num_cols > 0) {
     response.result = response.RESULT_COLLISION;
     response.epsilon = -1.0;
     response.volume = -1.0;
     return true;
   }
-  Hand *mHand = graspitCore->getWorld()->getHand(request.id);
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getHand(request.id);
+  if (m_hand == NULL) {
     response.result = response.RESULT_INVALID_ID;
     return true;
   }
 
   // if there is no collision, then begin computation
 
-  QualVolume mVolQual(mHand->getGrasp(), ("Volume"), "L1 Norm");
-  QualEpsilon mEpsQual(mHand->getGrasp(), ("Epsilon"), "L1 Norm");
+  QualVolume m_vol_qual(m_hand->getGrasp(), ("Volume"), "L1 Norm");
+  QualEpsilon m_eps_qual(m_hand->getGrasp(), ("Epsilon"), "L1 Norm");
 
   graspitCore->getWorld()->findAllContacts();
   graspitCore->getWorld()->updateGrasps();
 
-  response.epsilon = mEpsQual.evaluate();
-  response.volume = mVolQual.evaluate();
+  response.epsilon = m_eps_qual.evaluate();
+  response.volume = m_vol_qual.evaluate();
 
   return true;
 }
@@ -1189,15 +1184,15 @@ bool GraspitInterface::computeQualityCB(
 bool GraspitInterface::computeEnergyCB(
     graspit_interface::ComputeEnergy::Request &request,
     graspit_interface::ComputeEnergy::Response &response) {
-  Hand *mHand = graspitCore->getWorld()->getHand(request.handId);
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getHand(request.handId);
+  if (m_hand == NULL) {
     response.result = response.RESULT_INVALID_HAND_ID;
     ROS_INFO("Planning Hand is NULL");
     return true;
   }
-  GraspableBody *mObject =
+  GraspableBody *m_object =
       graspitCore->getWorld()->getGB(request.graspableBodyId);
-  if (mObject == NULL) {
+  if (m_object == NULL) {
     ROS_INFO("Planning Object is NULL");
     response.result = response.RESULT_INVALID_BODY_ID;
     return true;
@@ -1206,10 +1201,10 @@ bool GraspitInterface::computeEnergyCB(
   graspitCore->getWorld()->findAllContacts();
   graspitCore->getWorld()->updateGrasps();
 
-  std::vector<std::string> energyTypes =
+  std::vector<std::string> energy_types =
       SearchEnergyFactory::getInstance()->getAllRegisteredEnergy();
-  if (std::find(energyTypes.begin(), energyTypes.end(), request.energyType) ==
-      energyTypes.end()) {
+  if (std::find(energy_types.begin(), energy_types.end(), request.energyType) ==
+      energy_types.end()) {
     ROS_INFO_STREAM("Invalid Energy Type " << request.energyType << std::endl);
     response.result = response.RESULT_INVALID_ENERGY_TYPE;
     return true;
@@ -1218,11 +1213,11 @@ bool GraspitInterface::computeEnergyCB(
   SearchEnergy *se =
       SearchEnergyFactory::getInstance()->createEnergy(request.energyType);
 
-  bool isLegal;
-  double stateEnergy;
-  se->analyzeCurrentPosture(mHand, mObject, isLegal, stateEnergy);
-  response.isLegal = isLegal;
-  response.energy = stateEnergy;
+  bool is_legal;
+  double state_energy;
+  se->analyzeCurrentPosture(m_hand, m_object, is_legal, state_energy);
+  response.isLegal = is_legal;
+  response.energy = state_energy;
 
   return true;
 }
@@ -1230,37 +1225,37 @@ bool GraspitInterface::computeEnergyCB(
 bool GraspitInterface::approachToContactCB(
     graspit_interface::ApproachToContact::Request &request,
     graspit_interface::ApproachToContact::Response &response) {
-  Hand *mHand = graspitCore->getWorld()->getHand(request.id);
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getHand(request.id);
+  if (m_hand == NULL) {
     response.result = response.RESULT_INVALID_ID;
     return true;
   }
-  mHand->approachToContact(request.moveDist, request.oneStep);
+  m_hand->approachToContact(request.moveDist, request.oneStep);
   return true;
 }
 
 bool GraspitInterface::findInitialContactCB(
     graspit_interface::FindInitialContact::Request &request,
     graspit_interface::FindInitialContact::Response &response) {
-  Hand *mHand = graspitCore->getWorld()->getHand(request.id);
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getHand(request.id);
+  if (m_hand == NULL) {
     response.result = response.RESULT_INVALID_ID;
     return true;
   }
 
-  mHand->findInitialContact(request.moveDist);
+  m_hand->findInitialContact(request.moveDist);
   return true;
 }
 
 bool GraspitInterface::dynamicAutoGraspCompleteCB(
     graspit_interface::DynamicAutoGraspComplete::Request &request,
     graspit_interface::DynamicAutoGraspComplete::Response &response) {
-  Hand *mHand = graspitCore->getWorld()->getCurrentHand();
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getCurrentHand();
+  if (m_hand == NULL) {
     response.result = response.RESULT_INVALID_ID;
     return true;
   }
-  response.GraspComplete = mHand->dynamicAutograspComplete();
+  response.GraspComplete = m_hand->dynamicAutograspComplete();
   return true;
 }
 
@@ -1272,22 +1267,22 @@ void GraspitInterface::PlanGraspsCB(
 
   ROS_INFO("Waiting For Planner to Finish");
   int last_feedback_step;
-  while (mPlanner->isActive()) {
+  while (m_planner->isActive()) {
     if (_goal->feedback_num_steps < 1) {
       continue;
     }
-    int current_feedback_step = mPlanner->getCurrentStep();
-    if (current_feedback_step == mPlanner->getStartingStep()) {
+    int current_feedback_step = m_planner->getCurrentStep();
+    if (current_feedback_step == m_planner->getStartingStep()) {
       continue;
     }
     if ((current_feedback_step % _goal->feedback_num_steps == 0) &&
         (current_feedback_step != last_feedback_step)) {
-      ROS_INFO("Curret Planner Step: %d", mPlanner->getCurrentStep());
-      ROS_INFO("Curret Num Grasps: %d", mPlanner->getListSize());
+      ROS_INFO("Curret Planner Step: %d", m_planner->getCurrentStep());
+      ROS_INFO("Curret Num Grasps: %d", m_planner->getListSize());
 
       // collect grasps
       emit emitBuildFeedbackInMainThread();
-      plan_grasps_as->publishFeedback(feedback_);
+      plan_grasps_action_server->publishFeedback(feedback_);
       last_feedback_step = current_feedback_step;
     }
   }
@@ -1295,21 +1290,21 @@ void GraspitInterface::PlanGraspsCB(
   ROS_INFO("About to Call emit emitProcessPlannerResultsInMainThread();");
   emit emitProcessPlannerResultsInMainThread();
 
-  plan_grasps_as->setSucceeded(result_);
+  plan_grasps_action_server->setSucceeded(result_);
   ROS_INFO("Action ServerCB Finished");
 }
 
 void GraspitInterface::buildFeedbackInMainThread() {
-  feedback_.current_step = mPlanner->getCurrentStep();
+  feedback_.current_step = m_planner->getCurrentStep();
 
-  Hand *mHand = graspitCore->getWorld()->getCurrentHand();
+  Hand *m_hand = graspitCore->getWorld()->getCurrentHand();
 
   feedback_.grasps.clear();
   feedback_.energies.clear();
-  for (int i = 0; i < mPlanner->getListSize(); i++) {
-    const GraspPlanningState *gps = mPlanner->getGrasp(i);
+  for (int i = 0; i < m_planner->getListSize(); i++) {
+    const GraspPlanningState *gps = m_planner->getGrasp(i);
     graspit_interface::Grasp g;
-    graspPlanningStateToROSMsg(gps, g, mHand);
+    graspPlanningStateToROSMsg(gps, g, m_hand);
 
     feedback_.grasps.push_back(g);
     feedback_.energies.push_back(gps->getEnergy());
@@ -1320,38 +1315,38 @@ void GraspitInterface::buildFeedbackInMainThread() {
 void GraspitInterface::runPlannerInMainThread() {
   ROS_INFO("Planner Starting in Mainloop");
   ROS_INFO("Getting Hand");
-  Hand *mHand = graspitCore->getWorld()->getCurrentHand();
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getCurrentHand();
+  if (m_hand == NULL) {
     ROS_INFO("Planning Hand is NULL");
   }
-  GraspableBody *mObject = graspitCore->getWorld()->getGB(0);
-  if (mObject == NULL) {
+  GraspableBody *m_object = graspitCore->getWorld()->getGB(0);
+  if (m_object == NULL) {
     ROS_INFO("Planning Object is NULL");
   }
 
-  ROS_INFO("Initing mHandObjectState");
-  mHandObjectState = new GraspPlanningState(mHand);
-  mHandObjectState->setObject(mObject);
+  ROS_INFO("Initing m_hand_object_state");
+  m_hand_object_state = new GraspPlanningState(m_hand);
+  m_hand_object_state->setObject(m_object);
 
   switch (goal.search_space.type) {
   case graspit_interface::SearchSpace::SPACE_COMPLETE: {
-    mHandObjectState->setPositionType(SPACE_COMPLETE);
-    mHandObjectState->setRefTran(mObject->getTran());
+    m_hand_object_state->setPositionType(SPACE_COMPLETE);
+    m_hand_object_state->setRefTran(m_object->getTran());
     break;
   }
   case graspit_interface::SearchSpace::SPACE_AXIS_ANGLE: {
-    mHandObjectState->setPositionType(SPACE_AXIS_ANGLE);
-    mHandObjectState->setRefTran(mObject->getTran());
+    m_hand_object_state->setPositionType(SPACE_AXIS_ANGLE);
+    m_hand_object_state->setRefTran(m_object->getTran());
     break;
   }
   case graspit_interface::SearchSpace::SPACE_ELLIPSOID: {
-    mHandObjectState->setPositionType(SPACE_ELLIPSOID);
-    mHandObjectState->setRefTran(mObject->getTran());
+    m_hand_object_state->setPositionType(SPACE_ELLIPSOID);
+    m_hand_object_state->setRefTran(m_object->getTran());
     break;
   }
   case graspit_interface::SearchSpace::SPACE_APPROACH: {
-    mHandObjectState->setPositionType(SPACE_APPROACH);
-    mHandObjectState->setRefTran(mHand->getTran());
+    m_hand_object_state->setPositionType(SPACE_APPROACH);
+    m_hand_object_state->setRefTran(m_hand->getTran());
     break;
   }
   default: {
@@ -1360,19 +1355,19 @@ void GraspitInterface::runPlannerInMainThread() {
   }
   }
 
-  ROS_INFO("Initing mHandObjectState");
-  mHandObjectState->reset();
+  ROS_INFO("Initing m_hand_object_state");
+  m_hand_object_state->reset();
 
-  ROS_INFO("Initing mPlanner");
+  ROS_INFO("Initing m_planner");
 
   switch (goal.planner.type) {
   case graspit_interface::Planner::SIM_ANN: {
-    mPlanner = new SimAnnPlanner(mHand);
+    m_planner = new SimAnnPlanner(m_hand);
     ROS_INFO("Using graspit_interface::Planner::SIM_ANN ");
     break;
   }
   case graspit_interface::Planner::MULTI_THREADED: {
-    mPlanner = new GuidedPlanner(mHand);
+    m_planner = new GuidedPlanner(m_hand);
     ROS_INFO("Using graspit_interface::Planner::MULTI_THREADED ");
     break;
   }
@@ -1382,32 +1377,32 @@ void GraspitInterface::runPlannerInMainThread() {
   }
   }
 
-  mPlanner->setEnergyType(goal.search_energy);
+  m_planner->setEnergyType(goal.search_energy);
 
   if (!render_graphics)
-    mPlanner->setRenderType(RENDER_NEVER);
+    m_planner->setRenderType(RENDER_NEVER);
   if (goal.sim_ann_params.set_custom_params) {
     ROS_INFO("Switching SimAnn Annealing parameters to your custom defined "
              "values!!! ");
-    SimAnnParams simAnnParams;
-    simAnnParams.YC = goal.sim_ann_params.YC;
-    simAnnParams.HC = goal.sim_ann_params.HC;
-    simAnnParams.YDIMS = goal.sim_ann_params.YDIMS;
-    simAnnParams.NBR_ADJ = goal.sim_ann_params.NBR_ADJ;
-    simAnnParams.ERR_ADJ = goal.sim_ann_params.ERR_ADJ;
-    simAnnParams.DEF_T0 = goal.sim_ann_params.DEF_T0;
-    simAnnParams.DEF_K0 = goal.sim_ann_params.DEF_K0;
-    mPlanner->setAnnealingParameters(simAnnParams);
+    SimAnnParams sim_ann_params;
+    sim_ann_params.YC = goal.sim_ann_params.YC;
+    sim_ann_params.HC = goal.sim_ann_params.HC;
+    sim_ann_params.YDIMS = goal.sim_ann_params.YDIMS;
+    sim_ann_params.NBR_ADJ = goal.sim_ann_params.NBR_ADJ;
+    sim_ann_params.ERR_ADJ = goal.sim_ann_params.ERR_ADJ;
+    sim_ann_params.DEF_T0 = goal.sim_ann_params.DEF_T0;
+    sim_ann_params.DEF_K0 = goal.sim_ann_params.DEF_K0;
+    m_planner->setAnnealingParameters(sim_ann_params);
   }
 
   switch (goal.search_contact.type) {
   case graspit_interface::SearchContact::CONTACT_PRESET: {
-    mPlanner->setContactType(CONTACT_PRESET);
+    m_planner->setContactType(CONTACT_PRESET);
     ROS_INFO("Using graspit_interface::SearchContact::CONTACT_PRESET ");
     break;
   }
   case graspit_interface::SearchContact::CONTACT_LIVE: {
-    mPlanner->setContactType(CONTACT_LIVE);
+    m_planner->setContactType(CONTACT_LIVE);
     ROS_INFO("Using graspit_interface::SearchContact::CONTACT_LIVE ");
     break;
   }
@@ -1418,75 +1413,73 @@ void GraspitInterface::runPlannerInMainThread() {
   }
 
   ROS_INFO("Setting Planner Model State");
-  mPlanner->setModelState(mHandObjectState);
+  m_planner->setModelState(m_hand_object_state);
   int max_steps = goal.max_steps;
   if (max_steps == 0) {
     max_steps = 70000;
   }
   ROS_INFO("Setting Planner Max Steps %d", max_steps);
-  mPlanner->setMaxSteps(max_steps);
+  m_planner->setMaxSteps(max_steps);
 
   ROS_INFO("resetting Planner");
-  mPlanner->resetPlanner();
+  m_planner->resetPlanner();
 
   ROS_INFO("Starting Planner");
-  mPlanner->startPlanner();
+  m_planner->startPlanner();
 }
 
 void GraspitInterface::graspPlanningStateToROSMsg(const GraspPlanningState *gps,
                                                   graspit_interface::Grasp &g,
-                                                  Hand *mHand) {
-  gps->execute(mHand);
-  mHand->autoGrasp(false, 1.0, false);
+                                                  Hand *m_hand) {
+  gps->execute(m_hand);
+  m_hand->autoGrasp(false, 1.0, false);
 
   geometry_msgs::Pose pose;
-  transf t = mHand->getTran();
+  transf t = m_hand->getTran();
   pose.position.x = t.translation().x() / AXIS_SCALE;
   pose.position.y = t.translation().y() / AXIS_SCALE;
-  ;
   pose.position.z = t.translation().z() / AXIS_SCALE;
-  ;
   pose.orientation.w = t.rotation().w();
   pose.orientation.x = t.rotation().x();
   pose.orientation.y = t.rotation().y();
   pose.orientation.z = t.rotation().z();
 
   geometry_msgs::Vector3Stamped approach_direction;
-  vec3 approachInHand = mHand->getApproachTran() * vec3(0, 0, 1);
-  approachInHand.normalize();
-  approach_direction.vector.x = approachInHand.x();
-  approach_direction.vector.y = approachInHand.y();
-  approach_direction.vector.z = approachInHand.z();
-  approach_direction.header.frame_id = mHand->getName().toStdString();
+  vec3 approach_in_hand = m_hand->getApproachTran() * vec3(0, 0, 1);
+  approach_in_hand.normalize();
+  approach_direction.vector.x = approach_in_hand.x();
+  approach_direction.vector.y = approach_in_hand.y();
+  approach_direction.vector.z = approach_in_hand.z();
+  approach_direction.header.frame_id = m_hand->getName().toStdString();
 
   g.graspable_body_id = goal.graspable_body_id;
 
-  double dof[mHand->getNumDOF()];
-  mHand->getDOFVals(dof);
-  for (int i = 0; i < mHand->getNumDOF(); ++i) {
+  double dof[m_hand->getNumDOF()];
+  m_hand->getDOFVals(dof);
+  for (int i = 0; i < m_hand->getNumDOF(); ++i) {
     g.dofs.push_back(dof[i]);
   }
 
   g.pose = pose;
-  mHand->getGrasp()->update();
-  QualVolume mVolQual(mHand->getGrasp(), ("Volume"), "L1 Norm");
-  QualEpsilon mEpsQual(mHand->getGrasp(), ("Epsilon"), "L1 Norm");
+  m_hand->getGrasp()->update();
+  QualVolume m_vol_qual(m_hand->getGrasp(), ("Volume"), "L1 Norm");
+  QualEpsilon m_eps_qual(m_hand->getGrasp(), ("Epsilon"), "L1 Norm");
 
   graspitCore->getWorld()->findAllContacts();
   graspitCore->getWorld()->updateGrasps();
 
-  g.epsilon_quality = mEpsQual.evaluate();
-  g.volume_quality = mVolQual.evaluate();
+  g.epsilon_quality = m_eps_qual.evaluate();
+  g.volume_quality = m_vol_qual.evaluate();
   g.approach_direction = approach_direction;
 }
 
 void GraspitInterface::processPlannerResultsInMainThread() {
-  Hand *mHand = graspitCore->getWorld()->getCurrentHand();
-  if (mHand == NULL) {
+  Hand *m_hand = graspitCore->getWorld()->getCurrentHand();
+  if (m_hand == NULL) {
     ROS_INFO("Planning Hand is NULL");
   }
-  GraspableBody *mObject = graspitCore->getWorld()->getGB(0);
-  if (mObject == NULL) {
+  GraspableBody *m_object = graspitCore->getWorld()->getGB(0);
+  if (m_object == NULL) {
     ROS_INFO("Planning Object is NULL");
   }
 
@@ -1494,29 +1487,29 @@ void GraspitInterface::processPlannerResultsInMainThread() {
   result_.energies.clear();
 
   ROS_INFO("Publishing Result");
-  for (int i = 0; i < mPlanner->getListSize(); i++) {
-    const GraspPlanningState *gps = mPlanner->getGrasp(i);
+  for (int i = 0; i < m_planner->getListSize(); i++) {
+    const GraspPlanningState *gps = m_planner->getGrasp(i);
     graspit_interface::Grasp g;
-    graspPlanningStateToROSMsg(gps, g, mHand);
+    graspPlanningStateToROSMsg(gps, g, m_hand);
 
     result_.grasps.push_back(g);
     result_.energies.push_back(gps->getEnergy());
     result_.search_energy = goal.search_energy;
   }
 
-  if (mPlanner->getListSize() > 0) {
+  if (m_planner->getListSize() > 0) {
     ROS_INFO("Showing Grasp 0");
-    mPlanner->showGrasp(0);
+    m_planner->showGrasp(0);
   }
 
-  if (mHandObjectState != NULL) {
-    delete mHandObjectState;
-    mHandObjectState = NULL;
+  if (m_hand_object_state != NULL) {
+    delete m_hand_object_state;
+    m_hand_object_state = NULL;
   }
 
-  if (mPlanner != NULL) {
-    delete mPlanner;
-    mPlanner = NULL;
+  if (m_planner != NULL) {
+    delete m_planner;
+    m_planner = NULL;
   }
 }
 

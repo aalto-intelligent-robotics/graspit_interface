@@ -99,51 +99,51 @@ private:
   ros::NodeHandle *nh;
 
   // Service declarations
-  ros::ServiceServer addObject_srv;
+  ros::ServiceServer add_object_srv;
 
-  ros::ServiceServer getRobot_srv;
-  ros::ServiceServer getGraspableBody_srv;
-  ros::ServiceServer getBody_srv;
+  ros::ServiceServer get_robot_srv;
+  ros::ServiceServer get_graspable_body_srv;
+  ros::ServiceServer get_body_srv;
 
-  ros::ServiceServer getRobots_srv;
-  ros::ServiceServer getGraspableBodies_srv;
-  ros::ServiceServer getBodies_srv;
+  ros::ServiceServer get_robots_srv;
+  ros::ServiceServer get_graspable_bodies_srv;
+  ros::ServiceServer get_bodies_srv;
 
-  ros::ServiceServer setRobotPose_srv;
-  ros::ServiceServer setBodyPose_srv;
-  ros::ServiceServer setGraspableBodyPose_srv;
+  ros::ServiceServer set_robot_pose_srv;
+  ros::ServiceServer set_body_pose_srv;
+  ros::ServiceServer set_graspable_body_pose_srv;
 
-  ros::ServiceServer getDynamics_srv;
-  ros::ServiceServer setDynamics_srv;
+  ros::ServiceServer get_dynamics_srv;
+  ros::ServiceServer set_dynamics_srv;
 
-  ros::ServiceServer autoGrasp_srv;
-  ros::ServiceServer autoOpen_srv;
-  ros::ServiceServer forceRobotDOF_srv;
-  ros::ServiceServer moveDOFToContacts_srv;
-  ros::ServiceServer setRobotDesiredDOF_srv;
+  ros::ServiceServer auto_grasp_srv;
+  ros::ServiceServer auto_open_srv;
+  ros::ServiceServer force_robot_dof_srv;
+  ros::ServiceServer move_dof_to_contacts_srv;
+  ros::ServiceServer set_robot_desired_dof_srv;
 
-  ros::ServiceServer importRobot_srv;
-  ros::ServiceServer importObstacle_srv;
-  ros::ServiceServer importGraspableBody_srv;
+  ros::ServiceServer import_robot_srv;
+  ros::ServiceServer import_obstacle_srv;
+  ros::ServiceServer import_graspable_body_srv;
 
-  ros::ServiceServer clearWorld_srv;
-  ros::ServiceServer loadWorld_srv;
-  ros::ServiceServer saveWorld_srv;
+  ros::ServiceServer clear_world_srv;
+  ros::ServiceServer load_world_srv;
+  ros::ServiceServer save_world_srv;
 
-  ros::ServiceServer saveImage_srv;
-  ros::ServiceServer toggleAllCollisions_srv;
+  ros::ServiceServer save_image_srv;
+  ros::ServiceServer toggle_all_collisions_srv;
 
-  ros::ServiceServer computeQuality_srv;
-  ros::ServiceServer computeEnergy_srv;
+  ros::ServiceServer compute_quality_srv;
+  ros::ServiceServer compute_energy_srv;
 
-  ros::ServiceServer approachToContact_srv;
-  ros::ServiceServer findInitialContact_srv;
+  ros::ServiceServer approach_to_contact_srv;
+  ros::ServiceServer find_initial_contact_srv;
 
-  ros::ServiceServer dynamicAutoGraspComplete_srv;
+  ros::ServiceServer dynamic_auto_grasp_complete_srv;
 
   // ActionServer declarations
   actionlib::SimpleActionServer<graspit_interface::PlanGraspsAction>
-      *plan_grasps_as;
+      *plan_grasps_action_server;
   graspit_interface::PlanGraspsFeedback feedback_;
   graspit_interface::PlanGraspsResult result_;
   graspit_interface::PlanGraspsGoal goal;
@@ -169,8 +169,8 @@ private:
   ros::ServiceClient save_world_client;
   ros::ServiceClient add_object_client;
 
-  GraspPlanningState *mHandObjectState;
-  SimAnnPlanner *mPlanner;
+  GraspPlanningState *m_hand_object_state;
+  SimAnnPlanner *m_planner;
 
   QLabel *scene_completion_time;
   QLabel *grasp_planning_time;
@@ -182,7 +182,7 @@ private:
   void addToWorld(const QString modelname, const QString object_name,
                   const transf object_pose);
   void addObject(graspit_msgs::ObjectInfo object);
-  bool firstTimeInMainLoop;
+  bool first_time_in_main_loop;
 
   // Service callbacks
   bool addObjectCB(graspit_interface::AddObject::Request &request,
@@ -305,9 +305,7 @@ private:
     geometry_msgs::Pose ret;
     ret.position.x = pose.translation().x() / AXIS_SCALE;
     ret.position.y = pose.translation().y() / AXIS_SCALE;
-    ;
     ret.position.z = pose.translation().z() / AXIS_SCALE;
-    ;
     ret.orientation.w = pose.rotation().w();
     ret.orientation.x = pose.rotation().x();
     ret.orientation.y = pose.rotation().y();
