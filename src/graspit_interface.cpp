@@ -441,9 +441,8 @@ void GraspitInterface::simulationExperimentCB(
 }
 
 void GraspitInterface::onBrowseButtonPressed(int id) {
-  QString directory =
-      QDir::toNativeSeparators(QFileDialog::getExistingDirectory(
-          0, tr("Find Files"), QDir::currentPath()));
+  QString directory = QDir::toNativeSeparators(
+      QFileDialog::getExistingDirectory(0, tr("Find Files"), "~"));
   if (id == 0)
     file_path_to_ground_truth_meshes = directory.toStdString();
   else if (id == 1)
