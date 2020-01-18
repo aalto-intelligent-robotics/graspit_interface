@@ -1,3 +1,14 @@
+<?xml version="1.0"?>
 <launch>
-  <node name="graspit_interface" pkg="graspit_interface" type="launch_graspit.sh" output="screen" />
+  <arg name="render" default="true"/>
+  <arg name="grasp_planner" default="simulated_annealing"/>
+  <arg name="number_of_best_grasps" default="10"/>
+  <arg name="rank_grasps_on_samples" default="false"/>
+  <arg name="simulation_experiments" default="false"/>
+  <param name="Render" value="$(arg render)"/>
+  <param name="Grasp_Planner" value="$(arg grasp_planner)"/>
+  <param name="Number_of_Best_Grasps" value="$(arg number_of_best_grasps)"/>
+  <param name="Rank_Grasps_on_Samples" value="$(arg rank_grasps_on_samples)"/>
+
+  <node name="graspit_interface" pkg="graspit_interface" type="launch_graspit.sh" output="screen"/>
 </launch>

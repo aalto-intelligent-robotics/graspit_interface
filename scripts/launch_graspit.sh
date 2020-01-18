@@ -10,5 +10,5 @@ else
 fi
 
 export GRASPIT_PLUGIN_DIR=$(dirname $(catkin_find --first-only libgraspit_interface.so))
-
+echo "Using GRASPIT_PLUGIN_DIR=" $GRASPIT_PLUGIN_DIR
 graspit_simulator -p libgraspit_interface --node_name graspit

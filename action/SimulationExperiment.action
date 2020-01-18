@@ -1,0 +1,10 @@
+# Goal
+string path_to_ground_truth_meshes 
+string path_to_shape_completed_meshes
+string path_to_save_location
+bool evaluate_on_shape_samples
+---
+# Result
+bool success
+---
+# Feedback 

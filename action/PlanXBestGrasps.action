@@ -1,0 +1,15 @@
+# Goal
+string filename 
+string planner
+bool rank_grasps_on_samples
+geometry_msgs/Vector3 mesh_offset
+int8 number_of_top_x_grasps_to_return
+---
+# Result
+bool success
+int32[] top_x_epsilon_quality_grasps
+int32[] top_x_volume_quality_grasps
+sensor_msgs/JointState[] hand_joint_states 
+geometry_msgs/Pose[] hand_poses
+---
+# Feedback 
